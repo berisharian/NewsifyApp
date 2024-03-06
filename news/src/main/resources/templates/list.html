@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>NewsifyApp</title>
+    <!-- Add Bootstrap CDN link for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/e59232f0a1.js" crossorigin="anonymous"></script>
+
+</head>
+<body class="container mt-4">
+
+<div>
+    <!-- The form below should invoke the method NewsController.showNews -->
+    <form id="filter-form" class="filter-form">
+        <div class="form-group">
+            <label for="price">Price</label>
+            <input id="price" type="double" name="price" class="form-control"/>
+        </div>
+        <div class="form-group">
+            <label for="type">Type</label>
+            <select id="type" name="type" class="form-control">
+                <option value="">All</option>
+                <!-- For each type you should have one <option> like below -->
+                <option th:each="type:${types}" th:value="${type}" th:text="${type}"> [type]</option>
+            </select>
+        </div>
+        <button id="filter" type="submit" class="btn btn-primary">Filter</button>
+    </form>
+    <div>
+        <!-- NewsController.showAdd -->
+        <th:block sec:authorize="hasRole('ROLE_ADMIN')">
+            <a href="/news/add" class="btn btn-success add-item">
+                Add news
+            </a>
+        </th:block>
+    </div>
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+        <tr>
+            <th>Match name</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Type</th>
+            <th>Category</th>
+            <th>Likes</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <!-- For each news you should have one <tr> like below -->
+        <tr class="item" th:each="n : ${news}">
+            <td th:text="${n.name}">[news.name]</td>
+            <td th:text="${n.description}">[news.description]</td>
+            <td th:text="${n.price}">[news.price]</td>
+            <td th:text="${n.type}">[news.type]</td>
+            <td th:text="${n.category.name}">[news.category]</td>
+            <td th:text="${n.likes}"> [news.likes]</td>
+            <td>
+                <!-- NewsController.delete -->
+                <th:block sec:authorize="hasRole('ROLE_ADMIN')">
+                    <form th:method="POST" th:action="@{'/news/{id}/delete' (id=${n.id})}">
+                        <button type="submit" class="btn btn-danger delete-item">Delete</button>
+                    </form>
+                    <!-- NewsController.showEdit -->
+                    <a class="btn btn-primary edit-item" th:href="@{'/news/{id}/edit' (id=${n.id})}">Edit</a>
+                </th:block>
+                <!-- NewsController.follow -->
+                <th:block sec:authorize="hasRole('ROLE_USER')">
+                    <form th:method="POST" th:action="@{'/news/{id}/like' (id=${n.id})}">
+                        <button type="submit" class="btn btn-info like-item">Like</button>
+                    </form>
+                </th:block>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div>
+    <ul id="nav" class="nav">
+        <li class="nav-item"><a href="/" class="nav-link">Home</a></li>
+        <li class="nav-item"><a href="/login" class="nav-link">Login</a></li>
+        <li class="nav-item"><a href="/logout" class="nav-link">Logout</a></li>
+    </ul>
+</div>
+
+
+</body>
+</html>
